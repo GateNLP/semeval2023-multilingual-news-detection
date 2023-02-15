@@ -10,7 +10,7 @@ from glob import glob
 import os
 
 LANGS = ['en', 'es', 'fr', 'ge', 'gr', 'it', 'ka', 'po', 'ru']
-ROOT = '../../data/data'
+ROOT = '../../data/'
 label_decoder = {
     "LABEL_0": "opinion",
     "LABEL_1": "reporting",

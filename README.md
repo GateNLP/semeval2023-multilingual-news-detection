@@ -4,4 +4,4 @@ This is the source code for [SemEval 2023 Task 3: _Detecting the category, the f
 
 ## Setup
 
-Download the organiser data and extract everything into the `./data/` directory, i.e. the actual data should be located at `./data/data/{LANG}/`.
+Download the organiser data and extract the data dir into `./data/`, i.e. each language's data should be at `./data/{LANG}/`
