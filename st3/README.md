@@ -4,13 +4,7 @@
 The two models used for the final submissions can be obtained by running the following command:
 
 ```shell
-sh run.sh
+./run.sh
 ```
 
-To configure custom experiments refer to <b>train.py</b> and it's arguments.
-
-## Adapter Models
-TODO
-
-## Ensemble Voting
-TODO
+To configure custom experiments refer to <b>train.py</b> and its arguments.
