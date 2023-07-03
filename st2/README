@@ -1,0 +1,11 @@
+Instructions:
+
+Obtaining English translations: 
+In order to train the monolingual MUPPET model, you must obtain translations for all non-English data. 
+
+First, call the function produce_joined_data() from st2_utils_acl.py. 
+This will save a .tsv file contains all articles from the organizer train and dev set (/st2/processed_data/joined.tsv)
+Next, upload joined.tsv to Google translate to obtain English translations. 
+Add these translations to the original joined.tsv under the new column 'text_en'.
+
+To train the MUPPET model, run st2/produce_muppet_no_class_weighting_acl.py 
