@@ -1,5 +1,9 @@
 # Subtask 1
 
+## Creating joined data
+
+Use the `create_joined.py` script to join train/dev data into a single TSV file.
+
 ## External Satire Data
 
 Download the articles from [Goldbeck et. al's Fake News Dataset](https://github.com/jgolbeck/fakenews). Extract the satire article text files into `./data/ext_satire/articles/`.
