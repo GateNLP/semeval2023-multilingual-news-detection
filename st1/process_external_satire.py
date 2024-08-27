@@ -1,11 +1,11 @@
 import argparse
-import glob
-
 import pandas as pd
 import numpy as np
 import pathlib
 
 langs = ['ge', 'en', 'fr', 'it', 'po', 'ru']
+data_root = pathlib.Path(__file__).parent.parent / 'data'
+
 
 def _strip_url(text):
     """Remove the article URL on line 2 of the data."""
@@ -16,11 +16,11 @@ def _strip_url(text):
     return '\n'.join(new_lines)
 
 def create():
-    satire_files = glob.glob('../data/ext_satire/*.txt')
+    satire_files = (data_root / 'ext_satire' / 'articles').glob('*.txt')
     satire_articles = {}
 
     for file in satire_files:
-        article_id = file[16:-4]
+        article_id = file.name[:-4]
         try:
             with open(file, 'r', encoding='utf8') as f:
                 file_contents = f.read()
@@ -36,23 +36,25 @@ def create():
     df = pd.DataFrame.from_dict(satire_articles, orient='index', columns=['text'])
     df['label'] = 'satire'
     df['language'] = 'en'
+    # Give them a fake article ID like the rest of the data
     df['article'] = df.index.map(lambda i: f"12345{i}")
     df['text'] = df['text'].apply(_strip_url)
     df['lang_label'] = df.apply(lambda r: f"{r['language']}_{r['label']}", axis=1)
-    df[['article', 'text', 'language', 'label', 'lang_label']].to_csv('../data/ext_satire/external_satire.tsv', sep = '\t')
+    df[['article', 'text', 'language', 'label', 'lang_label']].to_csv(data_root / 'ext_satire' / 'external_satire.tsv', sep = '\t')
 
 def split():
-    df = pd.read_csv('../data/ext_satire/external_satire.tsv', sep='\t', index_col=0)
+    df = pd.read_csv(data_root / 'ext_satire' / 'external_satire.tsv', sep='\t', index_col=0)
     df = df.sample(frac=1, random_state=2023)
     print(len(df), "external satire loaded")
 
     chunked = np.array_split(df, len(langs))
 
-    pathlib.Path('../data/ext_satire/to_translate').mkdir(exist_ok=True)
+    to_translate_root = data_root / 'ext_satire' / 'to_translate'
+    to_translate_root.mkdir(exist_ok=True)
 
     for i, chunk in enumerate(chunked):
         print(langs[i], len(chunk))
-        chunk.to_excel(f'../data/ext_satire/to_translate/{langs[i]}.xlsx')
+        chunk.to_excel(to_translate_root / f'{langs[i]}.xlsx')
 
     print("Now translate each split and put in data/ext_satire/translated/")
 
@@ -60,7 +62,7 @@ def split():
 def combine():
     lang_dfs = []
     for lang in langs:
-        lang_df = pd.read_excel(f'../data/ext_satire/translated/{lang}.xlsx',
+        lang_df = pd.read_excel(data_root / 'ext_satire' / 'translated' / f'{lang}.xlsx',
                                 names=['article', 'text', 'language', 'label'],
                                 index_col=0)
         lang_df['language'] = lang
@@ -71,7 +73,7 @@ def combine():
     all_langs['lang_label'] = all_langs.apply(lambda r: f"{r['language']}_{r['label']}",
                                               axis=1)
 
-    all_langs.to_csv('../data/ext_satire/external_satire_translated.tsv', sep='\t')
+    all_langs.to_csv(data_root / 'ext_satire' / 'external_satire_translated.tsv', sep='\t')
 
 
 if __name__ == "__main__":
@@ -81,6 +83,8 @@ if __name__ == "__main__":
                              'create a split for each target language. combine: '
                              'recombine translated splits.')
     args = parser.parse_args()
+
+    assert (data_root / 'ext_satire' / 'articles').exists(), "External satire articles not found"
 
     if args.task == 'create':
         create()
